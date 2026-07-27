@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pinterest Video & Image Downloader Pro</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0b0f19;
+        }
+        .pin-accent {
+            background-color: #e60023;
+        }
+        .pin-accent:hover {
+            background-color: #cc001e;
+        }
+    </style>
+</head>
+<body class="text-slate-200 min-h-screen flex flex-col justify-between">
+
+    <!-- Navbar -->
+    <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur-lg sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="pin-accent text-white p-2.5 rounded-2xl flex items-center justify-center w-11 h-11 shadow-lg shadow-red-600/30">
+                    <i class="fa-brands fa-pinterest text-2xl animate-pulse"></i>
+                </div>
+                <div>
+                    <span class="text-xl font-extrabold tracking-wide bg-gradient-to-r from-red-500 to-rose-400 bg-clip-text text-transparent">
+                        PinFetch <span class="text-xs text-rose-500/80 font-bold px-1.5 py-0.5 rounded bg-rose-500/10 ml-1">Java Edition</span>
+                    </span>
+                    <p class="text-[10px] text-slate-500 font-medium">Ultra Video Extractor</p>
+                </div>
+            </div>
+            <div class="text-xs text-slate-400 font-semibold bg-slate-950/60 border border-slate-800 rounded-full px-3 py-1.5 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                Spring Engine Active
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="flex-grow flex items-center justify-center px-4 py-10">
+        <div class="max-w-2xl w-full bg-slate-900/40 border border-slate-800/80 rounded-3xl p-6 md:p-8 shadow-2xl backdrop-blur-2xl">
+            
+            <!-- Judul Utama -->
+            <div class="text-center mb-8">
+                <h1 class="text-3xl md:text-4xl font-extrabold text-white mb-3 tracking-tight leading-tight">
+                    Pinterest Downloader
+                </h1>
+                <p class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+                    Tempel tautan Pinterest Anda untuk mengambil video resolusi tinggi (<span class="text-rose-500 font-bold">MP4</span>) atau gambar (<span class="text-rose-500 font-bold">JPG/PNG</span>) secara instan.
+                </p>
+            </div>
+
+            <!-- Input Form Box -->
+            <div class="space-y-4">
+                <div class="relative group">
+                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500 group-focus-within:text-red-500 transition-colors">
+                        <i class="fa-solid fa-link text-lg"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="pinUrl" 
+                        placeholder="Tempel link video atau foto Pinterest di sini..." 
+                        class="w-full pl-12 pr-4 py-4 bg-slate-950/90 border border-slate-800 rounded-2xl focus:outline-none focus:ring-2 focus:ring-red-500/40 focus:border-red-500 text-sm text-white placeholder-slate-600 transition-all shadow-inner"
+                    />
+                </div>
+                
+                <button 
+                    onclick="fetchMedia()" 
+                    id="btnSubmit"
+                    class="w-full pin-accent text-white font-bold py-4 rounded-2xl transition-all duration-300 transform active:scale-[0.98] shadow-xl shadow-red-600/10 flex items-center justify-center space-x-2 text-base"
+                >
+                    <i class="fa-solid fa-cloud-arrow-down text-lg"></i>
+                    <span>Mulai Proses Ekstraksi</span>
+                </button>
+            </div>
+
+            <!-- Loading Spinner -->
+            <div id="loading" class="hidden mt-10 text-center py-6 animate-fade-in">
+                <div class="inline-block relative w-12 h-12">
+                    <div class="absolute top-0 left-0 w-full h-full border-4 border-slate-800 rounded-full"></div>
+                    <div class="absolute top-0 left-0 w-full h-full border-4 border-t-red-500 rounded-full animate-spin"></div>
+                </div>
+                <p class="text-slate-400 text-xs mt-3 font-medium tracking-wider animate-pulse">Menelusuri server Pinterest & mengekstrak file video...</p>
+            </div>
+
+            <!-- Error Notification -->
+            <div id="errorMessage" class="hidden mt-6 p-4.5 bg-red-950/40 border border-red-900/50 text-red-300 rounded-2xl text-sm flex items-start space-x-3 shadow-lg">
+                <i class="fa-solid fa-circle-exclamation mt-0.5 text-lg text-red-500"></i>
+                <div class="flex-1">
+                    <h4 class="font-bold mb-0.5 text-white">Gagal Mengekstrak</h4>
+                    <span id="errorText">Gagal memproses URL tersebut. Pastikan format tautan Pinterest valid.</span>
+                </div>
+            </div>
+
+            <!-- Result Card -->
+            <div id="resultCard" class="hidden mt-8 border-t border-slate-800/80 pt-8 animate-fade-in">
+                <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                    Hasil Pencarian Media
+                </h3>
+                
+                <!-- Media Player/Viewer Container -->
+                <div class="relative bg-slate-950/80 rounded-2xl overflow-hidden mb-6 border border-slate-800 flex items-center justify-center shadow-2xl p-2">
+                    <!-- Image Viewer -->
+                    <img id="imgPreview" class="hidden max-h-96 w-auto rounded-xl object-contain shadow-md" src="" alt="Pinterest Image Preview">
+                    
+                    <!-- Video Player -->
+                    <video id="videoPreview" controls class="hidden w-full max-h-96 rounded-xl shadow-md bg-black" playsinline></video>
+                </div>
+
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="bg-slate-950/50 rounded-xl p-3 border border-slate-800/80 text-center">
+                            <span class="block text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-0.5">Tipe Konten</span>
+                            <span id="mediaType" class="text-slate-300 font-extrabold uppercase text-xs tracking-widest bg-slate-800 px-2.5 py-0.5 rounded">UNKNOWN</span>
+                        </div>
+                        <div class="bg-slate-950/50 rounded-xl p-3 border border-slate-800/80 text-center">
+                            <span class="block text-[10px] text-slate-500 uppercase font-bold tracking-wider mb-0.5">Kualitas</span>
+                            <span class="text-emerald-400 font-extrabold text-xs tracking-wide">TERBAIK (HD)</span>
+                        </div>
+                    </div>
+
+                    <!-- Direct Download Button -->
+                    <a 
+                        id="btnDownload" 
+                        href="" 
+                        target="_blank"
+                        class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-xl transition-all flex items-center justify-center space-x-2 text-sm shadow-xl shadow-emerald-600/10 active:scale-[0.99]"
+                    >
+                        <i class="fa-solid fa-download text-lg"></i>
+                        <span id="btnDownloadText">Unduh File Sekarang</span>
+                    </a>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t border-slate-900 bg-slate-950/30 py-6 text-center text-xs text-slate-600">
+        <p class="mb-1">FOZ GPT Engine &copy; 2026. Aplikasi Web Downloader Berkinerja Tinggi (Java Spring Boot).</p>
+        <p>Gunakan pengunduhan backend lokal demi bypass filter CORS browser global.</p>
+    </footer>
+
+    <!-- JavaScript Event Handler -->
+    <script>
+        async function fetchMedia() {
+            const urlInput = document.getElementById('pinUrl').value.trim();
+            const loading = document.getElementById('loading');
+            const errorMessage = document.getElementById('errorMessage');
+            const resultCard = document.getElementById('resultCard');
+            const btnSubmit = document.getElementById('btnSubmit');
+            const imgPreview = document.getElementById('imgPreview');
+            const videoPreview = document.getElementById('videoPreview');
+            const btnDownload = document.getElementById('btnDownload');
+            const btnDownloadText = document.getElementById('btnDownloadText');
+            const mediaTypeSpan = document.getElementById('mediaType');
+
+            if (!urlInput) {
+                showError('Tolong masukkan tautan video/foto Pinterest Anda.');
+                return;
+            }
+
+            // Reset Tampilan
+            errorMessage.classList.add('hidden');
+            resultCard.classList.add('hidden');
+            imgPreview.classList.add('hidden');
+            videoPreview.classList.add('hidden');
+            videoPreview.pause();
+            videoPreview.removeAttribute('src');
+            loading.classList.remove('hidden');
+            btnSubmit.disabled = true;
+            btnSubmit.classList.add('opacity-50');
+
+            try {
+                const response = await fetch('/api/extract', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ url: urlInput })
+                });
+
+                const data = await response.json();
+
+                if (!response.ok || !data.success) {
+                    throw new Error(data.error || 'Terjadi gangguan internal saat memproses URL.');
+                }
+
+                mediaTypeSpan.textContent = data.type;
+
+                if (data.type === 'video') {
+                    videoPreview.src = data.media_url;
+                    videoPreview.classList.remove('hidden');
+                    btnDownloadText.textContent = 'Unduh Video MP4 (HD)';
+                } else {
+                    imgPreview.src = data.media_url;
+                    imgPreview.classList.remove('hidden');
+                    btnDownloadText.textContent = 'Unduh Gambar JPG (Original)';
+                }
+
+                btnDownload.href = `/api/download?url=${encodeURIComponent(data.media_url)}&type=${data.type}`;
+                
+                resultCard.classList.remove('hidden');
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                loading.classList.add('hidden');
+                btnSubmit.disabled = false;
+                btnSubmit.classList.remove('opacity-50');
+            }
+        }
+
+        function showError(msg) {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorText = document.getElementById('errorText');
+            errorText.textContent = msg;
+            errorMessage.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
